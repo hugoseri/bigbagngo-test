@@ -27,7 +27,6 @@ const theme = createMuiTheme({
 const useStyles = makeStyles(() => ({
   root: {
     height: "100vh",
-    width: "100vw",
   },
 }));
 

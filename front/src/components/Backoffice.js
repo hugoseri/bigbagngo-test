@@ -7,7 +7,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import DeleteButton from "@material-ui/icons/Delete";
 import CloseIcon from "@material-ui/icons/Close";
 import { useForm } from "react-hook-form";
 
@@ -73,10 +73,25 @@ const useStyles = makeStyles((theme) => ({
 export default function Backoffice() {
   const classes = useStyles();
   const [openModal, setOpenModal] = useState(false);
+  const [shopList, setShopList] = useState();
+  const [loading, setLoading] = useState();
+
+  function fetchData() {
+    setLoading(true);
+    ShopApi.getAll()
+      .then((result) => {
+        setShopList(result);
+      })
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className={classes.root}>
-      <Modal open={openModal} setOpen={setOpenModal} />
+      <Modal open={openModal} setOpen={setOpenModal} refetch={fetchData} />
       <div className={classes.header}>
         <Typography variant="h5">Shops manager</Typography>
         <Button
@@ -87,17 +102,17 @@ export default function Backoffice() {
           Add a shop
         </Button>
       </div>
-      <ShopList />
+      <ShopList shopList={shopList} loading={loading} refetch={fetchData} />
     </div>
   );
 }
 
-function Modal({ open, setOpen }) {
+function Modal({ open, setOpen, refetch }) {
   const classes = useStyles();
   const { control, handleSubmit } = useForm();
 
   function onSubmit(data) {
-    ApiService.post(data);
+    ApiService.post(data).then(() => refetch());
     setOpen(false);
   }
 
@@ -153,19 +168,8 @@ function Modal({ open, setOpen }) {
   );
 }
 
-function ShopList() {
+function ShopList({ shopList, loading, refetch }) {
   const classes = useStyles();
-  const [shopList, setShopList] = useState();
-  const [loading, setLoading] = useState();
-
-  useEffect(() => {
-    setLoading(true);
-    ShopApi.getAll()
-      .then((result) => {
-        setShopList(result);
-      })
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) {
     return (
@@ -183,7 +187,9 @@ function ShopList() {
     <div className={classes.shopList}>
       {shopList && <Shop shop={{ id: "ID", name: "Name" }} header />}
       {shopList ? (
-        shopList.map((shop) => <Shop key={shop.name} shop={shop} />)
+        shopList.map((shop) => (
+          <Shop key={shop.name} shop={shop} refetch={refetch} />
+        ))
       ) : (
         <NoResult />
       )}
@@ -191,15 +197,20 @@ function ShopList() {
   );
 }
 
-function Shop({ shop, header }) {
+function Shop({ shop, header, refetch }) {
   const classes = useStyles({ header });
+
+  function deleteItem() {
+    ApiService.delete(shop.id).then(() => refetch());
+  }
+
   return (
     <div className={classes.shop}>
       <Typography className={classes.shopText}>{shop.id}</Typography>
       <Typography className={classes.shopText}>{shop.name}</Typography>
       {!header ? (
-        <IconButton>
-          <MoreVertIcon />
+        <IconButton onClick={deleteItem}>
+          <DeleteButton />
         </IconButton>
       ) : (
         <Typography className={classes.shopText}>Actions</Typography>

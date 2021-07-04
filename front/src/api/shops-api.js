@@ -11,6 +11,10 @@ const ApiService = {
     const response = await axios.post(BASE_API_URL, data);
     return response?.data;
   },
+  async delete(id) {
+    const response = await axios.delete(`${BASE_API_URL}/${id}`);
+    return response?.data;
+  },
 };
 
 export default ApiService;
