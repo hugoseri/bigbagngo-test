@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { Link } from "react-router-dom";
 
 import ShopApi from "api/shops-api";
-import { ReactComponent as NoResultIllustration } from "assets/sad.svg";
+import NoResult from "components/NoResult";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -127,23 +125,5 @@ function Shop({ data }) {
     <div className={classes.shop}>
       <Typography className={classes.shopText}>{data.name}</Typography>
     </div>
-  );
-}
-
-function NoResult() {
-  const classes = useStyles();
-
-  return (
-    <>
-      <NoResultIllustration />
-      <Typography variant="h6" className={classes.noResult}>
-        Aucun résultat...
-      </Typography>
-      <Link to="/admin">
-        <Button variant="contained" color="primary">
-          Ajouter un magasin
-        </Button>
-      </Link>
-    </>
   );
 }
