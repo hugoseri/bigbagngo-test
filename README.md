@@ -18,7 +18,7 @@ Once containers are ready to go (it can takes a few minutes), you can access the
 ## Orchestration
 
 - [x] Run the whole project inside containers using docker-compose
-- [ ] Communication between each service
+- [ ] Communication between each service following micro service communcation patterns
 
 ## Backend
 
