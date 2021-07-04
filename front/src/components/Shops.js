@@ -1,17 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { ReactComponent as NoResultIllustration } from "assets/sad.svg";
+import { Link } from "react-router-dom";
 
 import ShopApi from "api/shops-api";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "center",
     flexWrap: "wrap",
     margin: "auto",
     maxWidth: 1200,
     padding: theme.spacing(6),
+  },
+  loaderContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: "30%",
+  },
+  noResult: {
+    width: "100%",
+    textAlign: "center",
+    padding: theme.spacing(4, 0),
   },
   group: {
     width: "25%",
@@ -41,33 +56,51 @@ const useStyles = makeStyles((theme) => ({
 export default function Shops() {
   const classes = useStyles();
   const [shopList, setShopList] = useState();
+  const [loading, setLoading] = useState();
 
   useEffect(() => {
-    ShopApi.getAll().then((result) => {
-      const resultGroupBy = result.reduce((acc, curr) => {
-        let group = curr.name[0].toUpperCase(); // first letter
-        if (!acc[group]) {
-          acc[group] = { group, children: [curr] };
-        } else {
-          acc[group].children.push(curr);
-        }
-        return acc;
-      }, {});
-      setShopList(resultGroupBy);
-    });
+    setLoading(true);
+    ShopApi.getAll()
+      .then((result) => {
+        const resultGroupBy = result.reduce((acc, curr) => {
+          let group = curr.name[0].toUpperCase(); // first letter
+          if (!acc[group]) {
+            acc[group] = { group, children: [curr] };
+          } else {
+            acc[group].children.push(curr);
+          }
+          return acc;
+        }, {});
+        setShopList(resultGroupBy);
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return (
+      <div className={classes.loaderContainer}>
+        <CircularProgress
+          size={80}
+          color="primary"
+          className={classes.loader}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={classes.root}>
-      {shopList
-        ? Object.entries(shopList)
-            .sort(([_, a], [__, b]) =>
-              a.group.toLowerCase().localeCompare(b.group.toLowerCase())
-            )
-            .map(([_, value]) => {
-              return <ShopGroup key={value.group} group={value} />;
-            })
-        : "Chargement..."}
+      {shopList ? (
+        Object.entries(shopList)
+          .sort(([_, a], [__, b]) =>
+            a.group.toLowerCase().localeCompare(b.group.toLowerCase())
+          )
+          .map(([_, value]) => {
+            return <ShopGroup key={value.group} group={value} />;
+          })
+      ) : (
+        <NoResult />
+      )}
     </div>
   );
 }
@@ -94,5 +127,23 @@ function Shop({ data }) {
     <div className={classes.shop}>
       <Typography className={classes.shopText}>{data.name}</Typography>
     </div>
+  );
+}
+
+function NoResult() {
+  const classes = useStyles();
+
+  return (
+    <>
+      <NoResultIllustration />
+      <Typography variant="h6" className={classes.noResult}>
+        Aucun résultat...
+      </Typography>
+      <Link to="/admin">
+        <Button variant="contained" color="primary">
+          Ajouter un magasin
+        </Button>
+      </Link>
+    </>
   );
 }
