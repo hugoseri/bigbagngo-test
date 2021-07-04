@@ -6,14 +6,14 @@ import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CloseIcon from "@material-ui/icons/Close";
+import { useForm } from "react-hook-form";
 
 import ShopApi from "api/shops-api";
 import NoResult from "components/NoResult";
+import TextField from "components/TextField";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -94,6 +94,9 @@ export default function Backoffice() {
 
 function Modal({ open, setOpen, title, name, description, location }) {
   const classes = useStyles();
+  const { control, handleSubmit } = useForm();
+
+  function onSubmit(data) {}
 
   return (
     <Dialog
@@ -111,29 +114,38 @@ function Modal({ open, setOpen, title, name, description, location }) {
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
           <TextField
+            control={control}
+            name="name"
             label="Name"
             variant="outlined"
             className={classes.field}
-          ></TextField>
+          />
           <TextField
+            control={control}
+            name="description"
             label="Description"
             variant="outlined"
             className={classes.field}
-          ></TextField>
+          />
           <TextField
+            control={control}
+            name="location"
             label="Location"
             variant="outlined"
             className={classes.field}
-          ></TextField>
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            className={classes.field}
+          >
+            Submit
+          </Button>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button variant="contained" color="primary">
-          Submit
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }
