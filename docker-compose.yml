@@ -1,0 +1,50 @@
+version: "3"
+services:
+  ##############################
+  ## SERVER ##
+  server:
+    build:
+      context: ./shop-service
+      dockerfile: Dockerfile
+    networks:
+      - webapp
+      - database
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres_db
+    restart: always
+    command: ["./wait-for-it.sh", "5432:5432", "--", "node", "main.js"]
+    container_name: server
+  #############
+  ## CLIENT ##
+  client:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    networks:
+      - webapp
+    ports:
+      - 3000:3000
+    restart: always
+    container_name: client
+  ##############
+  ## POSTGRES ##
+  postgres_db:
+    image: postgres
+    networks:
+      - database
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=shop
+      - POSTGRES_DB=shop_database
+    restart: always
+    container_name: postgres_db
+
+networks:
+  webapp:
+    driver: bridge
+  database:
+    driver: bridge
