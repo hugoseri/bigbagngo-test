@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import ShopApi from "api/shops-api";
 import NoResult from "components/NoResult";
 import TextField from "components/TextField";
+import ApiService from "api/shops-api";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,11 +73,10 @@ const useStyles = makeStyles((theme) => ({
 export default function Backoffice() {
   const classes = useStyles();
   const [openModal, setOpenModal] = useState(false);
-  const [modalTitle, setModalTitle] = useState("Add a shop");
 
   return (
     <div className={classes.root}>
-      <Modal open={openModal} setOpen={setOpenModal} title={modalTitle} />
+      <Modal open={openModal} setOpen={setOpenModal} />
       <div className={classes.header}>
         <Typography variant="h5">Shops manager</Typography>
         <Button
@@ -92,20 +92,23 @@ export default function Backoffice() {
   );
 }
 
-function Modal({ open, setOpen, title, name, description, location }) {
+function Modal({ open, setOpen }) {
   const classes = useStyles();
   const { control, handleSubmit } = useForm();
 
-  function onSubmit(data) {}
+  function onSubmit(data) {
+    ApiService.post(data);
+    setOpen(false);
+  }
 
   return (
     <Dialog
       open={open}
       onClose={() => setOpen(false)}
-      aria-labelledby="Add or update shop modal"
+      aria-labelledby="Add shop modal"
     >
       <DialogTitle>
-        {title}
+        Add a shop
         <IconButton
           onClick={() => setOpen(false)}
           className={classes.closeButton}
