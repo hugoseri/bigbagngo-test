@@ -17,4 +17,4 @@ RUN yarn
 RUN apk add --no-cache bash
 RUN ["chmod", "+x", "/usr/src/app/wait-for-it.sh"]
 
-EXPOSE 3000
+EXPOSE 8080
