@@ -1,15 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
+import NavBar from "components/NavBar";
+import Shops from "components/Shops";
+import Backoffice from "components/Backoffice";
+import NoMatch from "components/NoMatch";
 
 function App() {
-  useEffect(() => {
-    fetch("http://localhost:8080/shop")
-      .then((result) => result.json())
-      .then((result) => {
-        console.log(result);
-      });
-  }, []);
-
-  return <div>Welcome to Sport Center.</div>;
+  return (
+    <Router>
+      <NavBar />
+      <Switch>
+        <Route exact path="/">
+          <Shops />
+        </Route>
+        <Route path="/admin">
+          <Backoffice />
+        </Route>
+        <Route path="*">
+          <NoMatch />
+        </Route>
+      </Switch>
+    </Router>
+  );
 }
 
 export default App;
